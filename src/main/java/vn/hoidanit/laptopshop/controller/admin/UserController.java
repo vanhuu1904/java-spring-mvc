@@ -1,14 +1,11 @@
 package vn.hoidanit.laptopshop.controller.admin;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.ServletContext;
+import jakarta.validation.Valid;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.services.UploadService;
 import vn.hoidanit.laptopshop.services.UserService;
@@ -33,15 +30,6 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-
-    @GetMapping("/")
-    public String getHomePage(Model model){
-        List<User> arrUser = this.userService.getAllUsersByEmail("huynam569@gmail.com");
-        System.out.println(">>list user: " + arrUser);
-        String test = this.userService.handleHello();
-        model.addAttribute("eric", test);
-        return "hello";
-    }
     @GetMapping("/admin/user")
     public String getUserPage(Model model) {
         List<User> users = this.userService.getAllUsers();
@@ -55,8 +43,14 @@ public class UserController {
         return "admin/user/create";
     }
     @PostMapping("/admin/user/create")
-     public String createUserPage(Model model, @ModelAttribute("newUser") User hoidanit, @RequestParam("hoidanitFile") MultipartFile file) {
+     public String createUserPage(Model model, @ModelAttribute("newUser") @Valid User hoidanit, BindingResult bindingResult, @RequestParam("hoidanitFile") MultipartFile file) {
          
+
+        List<FieldError> errors = bindingResult.getFieldErrors();
+        for(FieldError error: errors){
+            System.out.println(error.getObjectName() + " - " + error.getDefaultMessage());
+        }
+
          String avatar =  this.uploadService.handleSaveUploadFile(file, "avatar");
          
          String hashPassword = this.passwordEncoder.encode(hoidanit.getPassword());
@@ -71,7 +65,7 @@ public class UserController {
      public String getUserDetailPage(Model model, @PathVariable long id) {
         User user = this.userService.getUserById(id);
         model.addAttribute("user", user);
-        return "admin/user/show";
+        return "admin/user/detailUser";
     }
     @GetMapping(value = "/admin/user/update/{id}")
      public String getUpdateUserPage(Model model, @PathVariable long id) {
