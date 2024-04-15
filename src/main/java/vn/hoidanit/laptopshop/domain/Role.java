@@ -1,9 +1,12 @@
 package vn.hoidanit.laptopshop.domain;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Role {
@@ -14,6 +17,9 @@ public class Role {
     private String name;
 
     private String description;
+
+    @OneToMany(mappedBy = "role")  // mapped by theo tên được lưu bên User
+    private List<User> users;
 
     public long getId() {
         return id;
