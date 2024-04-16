@@ -7,8 +7,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "roles")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +20,8 @@ public class Role {
 
     private String description;
 
-    @OneToMany(mappedBy = "role")  // mapped by theo tên được lưu bên User
+    // role - one => many - users . ctrl + k . press 's'
+    @OneToMany(mappedBy = "role")
     private List<User> users;
 
     public long getId() {
